@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set to either "gpd-pocket", "gpd-pocket2", "gpd-pocket3", "gpd-p2-max", "gpd-micropc", "gpd-win2", "gpd-win-max" or "topjoy-falcon"
-UMPC="gpd-pocket3"
+UMPC="${UMPC-gpd-pocket3}"
 XORG_CONF_PATH="/usr/share/X11/xorg.conf.d"
 INTEL_CONF="${XORG_CONF_PATH}/20-${UMPC}-intel.conf"
 MODPROBE_CONF="/etc/modprobe.d/alsa-${UMPC}.conf"
@@ -203,7 +203,8 @@ fi
 if [ -z "${1}" ]; then
   usage
 else
-  MODE=$(echo "${1}" | tr '[:upper:]' '[:lower:]')
+  # echo -e doesn't print -e	
+  MODE=$(printf "%s" "${1}" | tr '[:upper:]' '[:lower:]')
 fi
 
 if [ -z "${UMPC}" ]; then
@@ -216,6 +217,8 @@ case "${UMPC}" in
   *) echo "ERROR! Unknown device name given."
      usage;;
 esac
+
+cd "$(dirname "$0")"
 
 case "${MODE}" in
   -d|--disable|disable)
