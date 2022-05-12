@@ -29,16 +29,22 @@ function inject_data() {
   fi
 
   if [ -f "${SOURCE_FILE}" ]; then
+    # Rename the GDM3 monitors configuration
+    if [[ "${TARGET_FILE}" == *"monitors.xml"* ]]; then
+      TARGET_FILE="${TARGET_DIR}/monitors.xml"
+    fi
+
+    if [ -f "${TARGET_FILE}" ]; then
+        mkdir -p backup
+        local DATE=$(date -r "${TARGET_FILE}" "+%m-%d-%Y-%H:%M:%S")
+        cp "${TARGET_FILE}" "backup/$(basename "${TARGET_FILE}").${DATE}"
+    fi
+	
     echo " - Injecting ${TARGET_FILE}"
     if [ ! -d "${TARGET_DIR}" ]; then
       mkdir -p "${TARGET_DIR}"
     fi
     cp "${SOURCE_FILE}" "${TARGET_FILE}"
-
-    # Rename the GDM3 monitors configuration
-    if [[ "${TARGET_FILE}" == *"monitors.xml"* ]]; then
-      mv -v "${TARGET_FILE}" "${TARGET_DIR}/monitors.xml"
-    fi
   fi
 }
 
