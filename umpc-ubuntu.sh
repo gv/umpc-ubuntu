@@ -6,7 +6,10 @@ XORG_CONF_PATH="/usr/share/X11/xorg.conf.d"
 INTEL_CONF="${XORG_CONF_PATH}/20-${UMPC}-intel.conf"
 MODPROBE_CONF="/etc/modprobe.d/alsa-${UMPC}.conf"
 MONITOR_CONF="${XORG_CONF_PATH}/40-${UMPC}-monitor.conf"
-MONITORS_XML="/var/lib/gdm3/.config/${UMPC}-monitors.xml"
+DISTRO_FAMILY="Debian"
+MONITORS_XML_TAIL=".config/${UMPC}-monitors.xml"
+MONITORS_PREFIX="/var/lib/gdm3/"
+MONITORS_PREFIX_RH="/var/lib/gdm/"
 TRACKPOINT_CONF="${XORG_CONF_PATH}/80-${UMPC}-trackpoint.conf"
 TOUCH_RULES="/etc/udev/rules.d/99-${UMPC}-touch.rules"
 BRCM4356_CONF="/lib/firmware/brcm/brcmfmac4356-pcie.txt"
@@ -223,6 +226,24 @@ case "${UMPC}" in
   *) echo "ERROR! Unknown device name given."
      usage;;
 esac
+
+if ! [ -d "$MONITORS_PREFIX" ]; then
+  if ! [ -d "$MONITORS_PREFIX_RH" ]; then
+    echo "Not found $MONITORS_PREFIX nor $MONITORS_PREFIX_RH"
+    echo "Unknown distro"
+    exit 1
+  fi
+  MONITORS_PREFIX=$MONITORS_PREFIX_RH
+  DISTRO_FAMILY="RHEL"
+fi
+
+if [ "$DISTRO_FAMILY" == "RHEL" -a "$UMPC" != "gpd-pocket2" ]; then
+  echo "'$UMPC' is not supported on $DISTRO_FAMILY"
+  echo "Only gpd-pocket2 is currently supported on RHEL"
+  exit 1
+fi
+
+MONITORS_XML="$MONITORS_PREFIX$MONITORS_XML_TAIL"
 
 cd "$(dirname "$0")"
 
